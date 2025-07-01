@@ -7,7 +7,8 @@ import { signInPath } from '@/paths'
 import { getAuth } from '../queries/get-auth'
 
 export const signOut = async () => {
-  const { session } = await getAuth()
+  const authResult = await getAuth()
+  const session = 'session' in authResult ? authResult.session : null
 
   if (!session) {
     redirect(signInPath())
