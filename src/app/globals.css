@@ -137,7 +137,7 @@
 
 @keyframes header-from-top {
   from {
-    transform: translateY(-16px);
+    transform: translateY(-100%);
   }
   to {
     transform: translateY(0);
@@ -146,4 +146,17 @@
 
 .animate-header-from-top {
   animation: header-from-top 0.5s ease-out;
+}
+
+@keyframes sidebar-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-sidebar-from-left {
+  animation: sidebar-from-left 0.5s ease-out;
 }
