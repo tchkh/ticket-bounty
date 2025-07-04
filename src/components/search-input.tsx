@@ -1,31 +1,31 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
 import { Input } from './ui/input'
 
 type SearchInputProps = {
+  value: string
+  onChange: (value: string) => void
   placeholder: string
 }
 
-export const SearchInput = ({ placeholder }: SearchInputProps) => {
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-  const { replace } = useRouter()
+export const SearchInput = ({
+  value,
+  onChange,
+  placeholder,
+}: SearchInputProps) => {
+  const handleSearch = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value)
+    },
+    250
+  )
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const params = new URLSearchParams(searchParams)
-    const value = event.target.value
-
-    if (value) {
-      params.set('search', value)
-    } else {
-      params.delete('search')
-    }
-
-    replace(`${pathname}?${params.toString()}`, {
-      scroll: false,
-    })
-  }
-
-  return <Input placeholder={placeholder} onChange={handleSearch} />
+  return (
+    <Input
+      defaultValue={value}
+      placeholder={placeholder}
+      onChange={handleSearch}
+    />
+  )
 }
