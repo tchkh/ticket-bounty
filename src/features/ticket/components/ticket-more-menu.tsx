@@ -2,7 +2,6 @@
 
 import { Ticket, TicketStatus } from '@prisma/client'
 import { LucideTrash } from 'lucide-react'
-import React from 'react'
 import { toast } from 'sonner'
 import { useConfirmDialog } from '@/components/confirm-dialog'
 import {
@@ -18,17 +17,17 @@ import { deleteTicket } from '../actions/delete-ticket'
 import { updateTicketStatus } from '../actions/update-ticket-status'
 import { TICKET_STATUS_LABELS } from '../constants'
 
-type TicketMoreMunuProps = {
+type TicketMoreMenuProps = {
   ticket: Ticket
-  trigger: React.ReactNode
+  trigger: React.ReactElement
 }
 
-export const TicktMoreMunu = ({ ticket, trigger }: TicketMoreMunuProps) => {
+export const TicketMoreMenu = ({ ticket, trigger }: TicketMoreMenuProps) => {
   const [deleteButton, deleteDialog] = useConfirmDialog({
     action: deleteTicket.bind(null, ticket.id),
     trigger: (
       <DropdownMenuItem>
-        <LucideTrash className="mr-2 h-4 w-4" />
+        <LucideTrash className="h-4 w-4" />
         <span>Delete</span>
       </DropdownMenuItem>
     ),
@@ -50,7 +49,7 @@ export const TicktMoreMunu = ({ ticket, trigger }: TicketMoreMunuProps) => {
     }
   }
 
-  const TicketStatusRadioGroupItem = (
+  const ticketStatusRadioGroupItems = (
     <DropdownMenuRadioGroup
       value={ticket.status}
       onValueChange={handleUpdateTicketStatus}
@@ -70,7 +69,7 @@ export const TicktMoreMunu = ({ ticket, trigger }: TicketMoreMunuProps) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="right">
-          {TicketStatusRadioGroupItem}
+          {ticketStatusRadioGroupItems}
           <DropdownMenuSeparator />
           {deleteButton}
         </DropdownMenuContent>
