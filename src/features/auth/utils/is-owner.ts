@@ -1,24 +1,24 @@
-import { User as AuthUser } from 'lucia'
+import { User } from "@prisma/client";
 
 type Entity = {
-  userId: string | null
-}
+  userId: string | null;
+};
 
 export const isOwner = (
-  authUser: AuthUser | null | undefined,
+  authUser: User | null | undefined,
   entity: Entity | null | undefined
 ) => {
   if (!authUser || !entity) {
-    return false
+    return false;
   }
 
   if (!entity.userId) {
-    return false
+    return false;
   }
 
   if (entity.userId !== authUser.id) {
-    return false
+    return false;
   } else {
-    return true
+    return true;
   }
-}
+};
