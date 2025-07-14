@@ -13,6 +13,8 @@ import { createSession } from "@/lib/lucia";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 import { generateRandomToken } from "@/utils/crypto";
+import { sendEmailVerification } from "../emails/send-email-verification";
+import { generateEmailVerificationCode } from "../utils/generate-email-verification-code";
 import { setSessionCookie } from "../utils/session-cookie";
 
 const signUpSchema = z
@@ -54,6 +56,13 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
         passwordHash,
       },
     });
+
+    const verificationCode = await generateEmailVerificationCode(
+      user.id,
+      email
+    );
+
+    await sendEmailVerification(username, email, verificationCode);
 
     const sessionToken = generateRandomToken();
     const session = await createSession(sessionToken, user.id);
