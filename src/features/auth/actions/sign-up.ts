@@ -9,6 +9,7 @@ import {
   toActionState,
 } from "@/components/form/utils/to-action-state";
 import { hashPassword } from "@/features/password/utils/hash-and-verify";
+import { inngest } from "@/lib/inngest";
 import { createSession } from "@/lib/lucia";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
@@ -52,6 +53,13 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
         username,
         email,
         passwordHash,
+      },
+    });
+
+    await inngest.send({
+      name: "app/auth.sign-up",
+      data: {
+        userId: user.id,
       },
     });
 
