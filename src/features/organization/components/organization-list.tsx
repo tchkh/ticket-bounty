@@ -4,6 +4,7 @@ import {
   LucideArrowUpRightFromSquare,
   LucidePen,
 } from "lucide-react";
+import Link from "next/link";
 import { SubmitButton } from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,11 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MembershipDeleteButton } from "@/features/membership/components/membership-delete-button";
+import { membershipsPath } from "@/paths";
 import { getOrganizationsByUser } from "../queries/get-organizations-by-user";
 import { OrganizationDeleteButton } from "./organization-delete-button";
 import { OrganizationSwitchButton } from "./organization-switch-button";
 
-export const OrganizationList = async () => {
+type OrganizationListProps = {
+  limitedAccess?: boolean;
+};
+
+export const OrganizationList = async ({
+  limitedAccess,
+}: OrganizationListProps) => {
   const organizations = await getOrganizationsByUser();
 
   const hasActive = organizations.some(
@@ -33,6 +42,7 @@ export const OrganizationList = async () => {
           <TableHead>Name</TableHead>
           <TableHead>Joined At</TableHead>
           <TableHead>Members</TableHead>
+          <TableHead>My Role</TableHead>
           <TableHead />
         </TableRow>
       </TableHeader>
@@ -58,8 +68,10 @@ export const OrganizationList = async () => {
           );
 
           const detailButton = (
-            <Button variant="outline" size="icon">
-              <LucideArrowUpRightFromSquare className="w-4 h-4" />
+            <Button variant="outline" size="icon" asChild>
+              <Link href={membershipsPath(organization.id)}>
+                <LucideArrowUpRightFromSquare className="w-4 h-4" />
+              </Link>
             </Button>
           );
 
@@ -69,6 +81,13 @@ export const OrganizationList = async () => {
             </Button>
           );
 
+          const leaveButton = (
+            <MembershipDeleteButton
+              organizationId={organization.id}
+              userId={organization.membershipByUser.userId}
+            />
+          );
+
           const deleteButton = (
             <OrganizationDeleteButton organizationId={organization.id} />
           );
@@ -76,9 +95,10 @@ export const OrganizationList = async () => {
           const buttons = (
             <>
               {switchButton}
-              {detailButton}
-              {editButton}
-              {deleteButton}
+              {limitedAccess ? null : detailButton}
+              {limitedAccess ? null : editButton}
+              {limitedAccess ? null : leaveButton}
+              {limitedAccess ? null : deleteButton}
             </>
           );
 
@@ -93,6 +113,9 @@ export const OrganizationList = async () => {
                 )}
               </TableCell>
               <TableCell>{organization._count.memberships}</TableCell>
+              <TableCell>
+                {organization.membershipByUser.membershipRole}
+              </TableCell>
               <TableCell className="flex justify-end gap-x-2">
                 {buttons}
               </TableCell>

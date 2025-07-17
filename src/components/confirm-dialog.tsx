@@ -1,5 +1,5 @@
-import { useActionState, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
+import { useActionState, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,69 +9,69 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { useActionFeedback } from './form/hooks/use-action-feedback'
-import { ActionState, EMPTY_ACTION_STATE } from './form/utils/to-action-state'
-import { Button } from './ui/button'
+} from "@/components/ui/alert-dialog";
+import { useActionFeedback } from "./form/hooks/use-action-feedback";
+import { ActionState, EMPTY_ACTION_STATE } from "./form/utils/to-action-state";
+import { Button } from "./ui/button";
 
 type UseConfirmDialogArgs = {
-  title?: string
-  description?: string
-  action: () => Promise<ActionState>
-  trigger: React.ReactElement | ((isLoading: boolean) => React.ReactElement)
-  onSuccess?: (actionState: ActionState) => void
-}
+  title?: string;
+  description?: string;
+  action: () => Promise<ActionState | undefined>;
+  trigger: React.ReactElement | ((isLoading: boolean) => React.ReactElement);
+  onSuccess?: (actionState: ActionState) => void;
+};
 
 export const useConfirmDialog = ({
-  title = 'Are you absolutely sure?',
-  description = 'This action cannot be undone. Make sure you understand the consequences.',
+  title = "Are you absolutely sure?",
+  description = "This action cannot be undone. Make sure you understand the consequences.",
   action,
   trigger,
   onSuccess,
 }: UseConfirmDialogArgs) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const [actionState, formAction, isPending] = useActionState(
     action,
     EMPTY_ACTION_STATE
-  )
+  );
 
   const dialogTrigger = (
-    <div className="inline-block" onClick={() => setIsOpen(state => !state)}>
-      {typeof trigger === 'function' ? trigger(isPending) : trigger}
+    <div className="inline-block" onClick={() => setIsOpen((state) => !state)}>
+      {typeof trigger === "function" ? trigger(isPending) : trigger}
     </div>
-  )
+  );
 
-  const toastRef = useRef<string | number | null>(null)
+  const toastRef = useRef<string | number | null>(null);
 
   useEffect(() => {
     if (isPending) {
-      toastRef.current = toast.loading('Deleting ...')
+      toastRef.current = toast.loading("Deleting ...");
     } else if (toastRef.current) {
-      toast.dismiss(toastRef.current)
+      toast.dismiss(toastRef.current);
     }
 
     return () => {
       if (toastRef.current) {
-        toast.dismiss(toastRef.current)
+        toast.dismiss(toastRef.current);
       }
-    }
-  }, [isPending])
+    };
+  }, [isPending]);
 
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
       if (actionState.message) {
-        toast.success(actionState.message)
+        toast.success(actionState.message);
       }
 
-      onSuccess?.(actionState)
+      onSuccess?.(actionState);
     },
     onError: ({ actionState }) => {
       if (actionState.message) {
-        toast.error(actionState.message)
+        toast.error(actionState.message);
       }
     },
-  })
+  });
 
   const dialog = (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -90,7 +90,7 @@ export const useConfirmDialog = ({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 
-  return [dialogTrigger, dialog] as const
-}
+  return [dialogTrigger, dialog] as const;
+};
