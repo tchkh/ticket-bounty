@@ -1,24 +1,32 @@
-import { getAuth } from '@/features/auth/queries/get-auth'
-import { isOwner } from '@/features/auth/utils/is-owner'
-import prisma from '@/lib/prisma'
-import { ParsedSearchParams } from '../search-params'
+import { getAuth } from "@/features/auth/queries/get-auth";
+import { isOwner } from "@/features/auth/utils/is-owner";
+import { getActiveOrganization } from "@/features/organization/queries/get-active-organization";
+import prisma from "@/lib/prisma";
+import { ParsedSearchParams } from "../search-params";
 
 export const getTickets = async (
   userId: string | undefined,
+  byOrganization: boolean,
   searchParams: ParsedSearchParams
 ) => {
-  const { user } = await getAuth()
+  const { user } = await getAuth();
+  const activeOrganization = await getActiveOrganization();
 
   const where = {
     userId,
     title: {
       contains: searchParams.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     },
-  }
+    ...(byOrganization && activeOrganization
+      ? {
+          organizationId: activeOrganization.id,
+        }
+      : {}),
+  };
 
-  const skip = searchParams.size * searchParams.page
-  const take = searchParams.size
+  const skip = searchParams.size * searchParams.page;
+  const take = searchParams.size;
 
   const [tickets, count] = await prisma.$transaction([
     prisma.ticket.findMany({
@@ -39,10 +47,10 @@ export const getTickets = async (
     prisma.ticket.count({
       where,
     }),
-  ])
+  ]);
 
   return {
-    list: tickets.map(ticket => ({
+    list: tickets.map((ticket) => ({
       ...ticket,
       isOwner: isOwner(user, ticket),
     })),
@@ -50,5 +58,5 @@ export const getTickets = async (
       count,
       hasNextPage: count > skip + take,
     },
-  }
-}
+  };
+};

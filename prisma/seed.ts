@@ -12,7 +12,7 @@ const users = [
   {
     username: "user",
     email: "techkh.io@gmail.com",
-    emailVerified: false,
+    emailVerified: true,
   },
 ];
 
@@ -77,11 +77,13 @@ const seed = async () => {
         userId: dbUsers[0].id,
         organizationId: dbOrganization.id,
         isActive: true,
+        membershipRole: "ADMIN",
       },
       {
         userId: dbUsers[1].id,
         organizationId: dbOrganization.id,
         isActive: false,
+        membershipRole: "MEMBER",
       },
     ],
   });
@@ -90,6 +92,7 @@ const seed = async () => {
     data: tickets.map((ticket) => ({
       ...ticket,
       userId: dbUsers[0].id,
+      organizationId: dbOrganization.id,
     })),
   });
 
